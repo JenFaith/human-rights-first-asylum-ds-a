@@ -520,9 +520,9 @@ class BIACase:
 
         # Analyze highest count and return that gender or empty string for equal
         if female_count > male_count:
-            return "Female"
+            return "female"
         elif male_count > female_count:
-            return "Male"
+            return "male"
         else:
             return ""
 
