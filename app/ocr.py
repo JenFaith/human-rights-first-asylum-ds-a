@@ -26,9 +26,9 @@ def make_fields(file) -> dict:
     case = BIACase(string)
     case_data = {
         'application': case.get_application(),
-        'date': case.get_date(),
+        'date': "test",  # case.get_date(),
         'country of origin': case.get_country_of_origin(),
-        'panel members': case.get_panel(),
+        'panel members': "test",  # case.get_panel(),
         'outcome': case.get_outcome(),
         'protected grounds': case.get_protected_grounds(),
         'based violence': case.get_based_violence(),
