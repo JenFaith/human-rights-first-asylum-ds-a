@@ -60,3 +60,48 @@ async def pdf_ocr(uuid: str):
         return {"status": "Connection refused!"}
     except ClientError:
         return {"status": f"File not found: {uuid}.pdf"}
+
+
+@app.post("/test-ocr/{feature}")
+async def get_body(feature, upload_f: UploadFile = File(...)):
+    """
+    Endpoint that will compare a feature (required URL parameter) against the feature
+    from OCR. Pass in the JSON file created by humanInput_json.py to get the specific
+    UUIDs that passed and failed matching to the JSON inputted to the API.
+    """
+    check_json = json.load(upload_f.file)
+    check_feature = check_json[feature]
+
+    try:
+        s3 = Session(
+            aws_access_key_id=os.getenv('ACCESS_KEY'),
+            aws_secret_access_key=os.getenv('SECRET_KEY'),
+        ).client('s3')
+
+        result_fail = {}
+        result_pass = {}
+
+        for uuid in check_feature:
+            response = s3.get_object(
+                Bucket=os.getenv('BUCKET_NAME'),
+                Key=f"{uuid}.pdf",
+            )
+            ocr_output = make_fields(response['Body'].read())
+            if ocr_output[feature] == check_feature[uuid]:
+                result_pass.update({str(uuid): f"PASS {ocr_output[feature], check_feature[uuid]}"})
+            else:
+                result_fail.update({str(uuid): f"FAIL {ocr_output[feature], check_feature[uuid]}"})
+        return {
+            "status": "Files received",
+            "pass": {
+                *result_pass
+            },
+            "fail": {
+                *result_fail
+            }
+        }
+
+    except ClientError:
+        return {"status": f"File not found: {uuid}.pdf"}
+    except ConnectionError:
+        return {"status": "Connection refused!"}
