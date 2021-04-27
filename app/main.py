@@ -8,16 +8,16 @@ Run Locally using Windows:
 winpty docker run -it -p 5000:5000 <name> uvicorn app.main:app --host=0.0.0.0 --port=5000
 
 """
+import json
 import os
 
 from boto3.session import Session
 from botocore.exceptions import ClientError, ConnectionError
-from fastapi import FastAPI
+from fastapi import FastAPI, File, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 
 from app.ocr import make_fields
-
 
 app = FastAPI(
     title="DS API for HRF Asylum",
