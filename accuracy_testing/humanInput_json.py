@@ -40,6 +40,9 @@ test_data['gender'] = test_data['gender'].apply(gender_prep)
 json_file = test_data.to_json(orient='records')
 
 
+# Write the JSON file to disk to allow for passing into the API
+# This data should always represent the 'truth' to test against
 with open('human_ocr.json', 'w') as f:
     f.write(json_file)
+
 
