@@ -1,9 +1,29 @@
-import pandas as pd
+# To prevent PANDAS from being installed into the project! This is for local use only.
+try:
+    import pandas as pd
+except ModuleNotFoundError as e:
+    print(f"{e.name} missing; install package locally, not project wide.")
 
 
-file_name = ''
 
-test_data = pd.read_csv(file_name)
+"""
+Get csv from human input to check values of OCR. Outputs into JSON where feature is
+main key. Each feature has dictionary with key as uuid and value of feature associated with uuid.
+
+EXAMPLE:
+--------
+{
+  "gender": {
+    "140194281-Ali-Fares-A047-654-200-BIA-Apr-30-2013": "male",
+    "165227167-K-O-A-BIA-Aug-27-2013": "female",
+    . . .
+    },
+  . . .
+}
+"""
+
+
+test_data = pd.read_csv('manual-data-extraction-allcases.csv')
 test_data.columns = ['old_idx', 'uuid', 'aws_link', 'data_entry_name',
                      'application', 'date', 'country_of_origin',
                      'panel_members', 'outcome', 'protected_grounds',
@@ -36,8 +56,9 @@ test_data['uuid'] = test_data['uuid'].apply(trim_pdf)
 # Apply empty string to n/a values
 test_data['gender'] = test_data['gender'].apply(gender_prep)
 
-
-json_file = test_data.to_json(orient='records')
+# Basic json records pattern
+test_data.set_index('uuid', inplace=True)
+json_file = test_data.to_json(orient='columns')
 
 
 # Write the JSON file to disk to allow for passing into the API
